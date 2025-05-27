@@ -1,0 +1,45 @@
+{
+  "name": "@beparallel/langchain-ts",
+  "version": "0.2.6",
+  "description": "Extracts Langchain prompts and generates TypeScript types.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "langchain-types": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prompt:generate": "node ./dist/cli.js --file=./types/prompts.ts && npx prettier --write ./types/prompts.ts",
+    "prettier": "npx prettier --write types/*.ts",
+    "prepublish": "pnpm run build"
+  },
+  "keywords": [
+    "langchain",
+    "prompts",
+    "typescript",
+    "dev-tool"
+  ],
+  "author": "Chris Rydahl",
+  "license": "MIT",
+  "dependencies": {
+    "@langchain/core": "^0.3.55",
+    "chalk": "4.1.2",
+    "clear": "^0.1.0",
+    "commander": "^13.1.0",
+    "figlet": "^1.8.1",
+    "fs": "0.0.1-security",
+    "langchain": "^0.3.25",
+    "langsmith": "^0.3.29",
+    "path": "^0.12.7",
+    "zod": "^3.25.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "dotenv": "^16.5.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  },
+  "type": "module",
+  "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
+}

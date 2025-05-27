@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "orta.vscode-jest",
+    "firsttris.vscode-jest-runner",
+    "pkief.material-icon-theme",
+    "humao.rest-client",
+    "yoavbls.pretty-ts-errors",
+    "dineug.vuerd-vscode"
+  ]
+}
