@@ -8,7 +8,7 @@ export function generateTypes(
 ) {
   const lines: string[] = [
     '// Auto-generated file by @beparallel/langchain-ts. Do not edit.\n',
-    '// For more information, visit https://github.com/buildKiosk/langchain-ts\n\n',
+    '// For more information, visit https://github.com/beparallel/langchain-ts\n\n',
     'import { z } from "zod";\n\n',
   ];
 
