@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "outDir": "dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "sourceMap": false,
-    "lib": ["es2020"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "es2022"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+    "compilerOptions": {
+        "outDir": "dist",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "declaration": true,
+        "sourceMap": false,
+        "lib": ["es2020"],
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "target": "es2022"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
 }

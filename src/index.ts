@@ -1,2 +1,2 @@
-export { extractPrompts } from './parser.js';
-export { generateTypes } from './type-generator.js';
+export { extractPrompts } from './lib/parser.js'
+export { generateTypes } from './lib/type-generator.js'
