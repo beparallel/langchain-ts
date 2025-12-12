@@ -27,15 +27,21 @@ async function main() {
         return
     }
 
-    const langchainTag = process.env.LANGCHAIN_TAG
+    const tagArg = process.argv.find((arg) => arg.startsWith('--tag='))
+    const langchainTag = tagArg ? tagArg.split('=')[1] : process.env.LANGCHAIN_TAG
+
     if (!langchainTag) {
         console.error('LANGCHAIN_TAG is not set')
         return
     }
 
+    const nameArg = process.argv.find((arg) => arg.startsWith('--name='))
+    const promptName = nameArg ? nameArg.split('=')[1] : undefined
+
     const prompts = await extractPrompts({
         langchainApiKey,
         langchainTag,
+        promptName,
     })
     await generateTypes(prompts, outputPath)
     console.log(`✅ Types generated at ${outputPath}`)
