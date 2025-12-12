@@ -4,10 +4,11 @@ A TypeScript tool for extracting Langchain prompts and generating corresponding 
 
 # Features
 
-- Extracts prompts from Langchain Hub
-- Generates TypeScript interfaces for prompt inputs and outputs
-- Automatically handles JSON schema conversion
-- Command-line interface for easy integration
+-   Extracts prompts from Langchain Hub
+-   Generates TypeScript interfaces for prompt inputs and outputs
+-   Automatically handles JSON schema conversion
+-   Command-line interface for easy integration
+-   Optional filtering by prompt name and tag override
 
 # Installation
 
@@ -33,7 +34,11 @@ LANGCHAIN_TAG=your_tag
 }
 ```
 
-Where X = the path to the file where you want to save the types.
+Where:
+
+-   `X` is the path to the file where you want to save the types.
+-   Optional: `--name=Y` to filter prompts by name (partial match).
+-   Optional: `--tag=Z` to override the `LANGCHAIN_TAG` environment variable.
 
 4. Run the script
 
