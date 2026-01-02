@@ -1,5 +1,5 @@
 import { ChatPromptTemplate } from '@langchain/core/prompts'
-import * as hub from 'langchain/hub'
+import { pull } from 'langchain/hub'
 
 import { Client } from 'langsmith'
 
@@ -27,7 +27,7 @@ export async function extractPrompts({
         }
         console.debug(`Generating prompt ${prompt.repo_handle}`)
         try {
-            const chatPromptTemplate = await hub.pull<ChatPromptTemplate>(`${prompt.repo_handle}:${langchainTag}`)
+            const chatPromptTemplate = await pull<ChatPromptTemplate>(`${prompt.repo_handle}:${langchainTag}`)
             result.push(chatPromptTemplate)
         } catch (error) {
             console.error(error)
