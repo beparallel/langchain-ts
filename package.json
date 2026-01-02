@@ -23,13 +23,13 @@
     "author": "Chris Rydahl",
     "license": "MIT",
     "dependencies": {
-        "@langchain/core": "^0.3.55",
+        "@langchain/core": "^1.1.8",
         "chalk": "4.1.2",
         "clear": "^0.1.0",
         "commander": "^13.1.0",
         "figlet": "^1.8.1",
         "fs": "0.0.1-security",
-        "langchain": "^0.3.25",
+        "langchain": "^1.2.3",
         "langsmith": "^0.3.29",
         "path": "^0.12.7",
         "zod": "^3.25.3"

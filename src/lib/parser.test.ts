@@ -1,5 +1,5 @@
 import { ChatPromptTemplate } from '@langchain/core/prompts'
-import * as hub from 'langchain/hub'
+import { pull } from 'langchain/hub'
 import { Client } from 'langsmith'
 import { extractPrompts } from './parser.js'
 
@@ -7,7 +7,7 @@ import { extractPrompts } from './parser.js'
 jest.mock('langchain/hub')
 jest.mock('langsmith')
 
-const mockHub = jest.mocked(hub)
+const mockPull = jest.mocked(pull)
 const MockClient = jest.mocked(Client)
 
 describe('Parser Module', () => {
@@ -47,7 +47,7 @@ describe('Parser Module', () => {
             const mockTemplate2 = {} as ChatPromptTemplate
 
             mockClientInstance.listPrompts.mockResolvedValue(mockPrompts)
-            mockHub.pull.mockResolvedValueOnce(mockTemplate1).mockResolvedValueOnce(mockTemplate2)
+            mockPull.mockResolvedValueOnce(mockTemplate1).mockResolvedValueOnce(mockTemplate2)
 
             // Act
             const result = await extractPrompts({
@@ -62,9 +62,9 @@ describe('Parser Module', () => {
                 isArchived: false,
                 sortField: 'updated_at',
             })
-            expect(mockHub.pull).toHaveBeenCalledTimes(2)
-            expect(mockHub.pull).toHaveBeenNthCalledWith(1, 'prompt1:test-tag')
-            expect(mockHub.pull).toHaveBeenNthCalledWith(2, 'prompt2:test-tag')
+            expect(mockPull).toHaveBeenCalledTimes(2)
+            expect(mockPull).toHaveBeenNthCalledWith(1, 'prompt1:test-tag')
+            expect(mockPull).toHaveBeenNthCalledWith(2, 'prompt2:test-tag')
             expect(result).toEqual([mockTemplate1, mockTemplate2])
         })
 
@@ -80,7 +80,7 @@ describe('Parser Module', () => {
 
             // Assert
             expect(result).toEqual([])
-            expect(mockHub.pull).not.toHaveBeenCalled()
+            expect(mockPull).not.toHaveBeenCalled()
         })
 
         test('should handle hub.pull errors gracefully', async () => {
@@ -91,7 +91,7 @@ describe('Parser Module', () => {
             const mockTemplate3 = {} as ChatPromptTemplate
 
             mockClientInstance.listPrompts.mockResolvedValue(mockPrompts)
-            mockHub.pull
+            mockPull
                 .mockResolvedValueOnce(mockTemplate1)
                 .mockRejectedValueOnce(new Error('Failed to pull prompt2'))
                 .mockResolvedValueOnce(mockTemplate3)
@@ -141,7 +141,7 @@ describe('Parser Module', () => {
             const mockTemplate = {} as ChatPromptTemplate
 
             mockClientInstance.listPrompts.mockResolvedValue(mockPrompts)
-            mockHub.pull.mockResolvedValue(mockTemplate)
+            mockPull.mockResolvedValue(mockTemplate)
 
             // Act
             await extractPrompts({
@@ -150,7 +150,7 @@ describe('Parser Module', () => {
             })
 
             // Assert
-            expect(mockHub.pull).toHaveBeenCalledWith('test-prompt:custom-tag')
+            expect(mockPull).toHaveBeenCalledWith('test-prompt:custom-tag')
         })
 
         test('should log debug messages for each prompt', async () => {
@@ -158,7 +158,7 @@ describe('Parser Module', () => {
             const mockPrompts = [{ repo_handle: 'prompt1' }, { repo_handle: 'prompt2' }]
 
             mockClientInstance.listPrompts.mockResolvedValue(mockPrompts)
-            mockHub.pull.mockResolvedValue({} as ChatPromptTemplate)
+            mockPull.mockResolvedValue({} as ChatPromptTemplate)
 
             // Act
             await extractPrompts({
@@ -176,7 +176,7 @@ describe('Parser Module', () => {
             const mockPrompts = [{ repo_handle: 'prompt1' }, { repo_handle: 'prompt2' }]
 
             mockClientInstance.listPrompts.mockResolvedValue(mockPrompts)
-            mockHub.pull.mockRejectedValueOnce(new Error('Error 1')).mockRejectedValueOnce(new Error('Error 2'))
+            mockPull.mockRejectedValueOnce(new Error('Error 1')).mockRejectedValueOnce(new Error('Error 2'))
 
             // Act
             const result = await extractPrompts({
