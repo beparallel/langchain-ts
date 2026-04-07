@@ -1,49 +1,48 @@
 # @beparallel/langchain-ts
 
-A TypeScript tool for extracting Langchain prompts and generating corresponding TypeScript types, with optional offline prompt export.
+A CLI tool that pulls prompts from [LangSmith Hub](https://smith.langchain.com/) and generates TypeScript types and optional JSON exports for offline use.
 
-# Features
+## Features
 
--   Extracts prompts from Langchain Hub
--   Generates TypeScript interfaces for prompt inputs and outputs
--   Exports full prompt content as JSON files for offline use
--   Automatically handles JSON schema conversion
--   Command-line interface for easy integration
--   Optional filtering by prompt name and tag override
+- **Type generation** -- produces TypeScript interfaces, enums, and Zod schemas from prompt input/output schemas
+- **Prompt export** -- serializes full prompt content to JSON files so you can load them offline without calling `pull()` at runtime
+- **Filtering** -- narrow results to a specific prompt by name, or override the Hub tag
+- **Composable flags** -- use `--file` and `--export-dir` independently or together in a single run
 
-# Installation
+## Installation
 
-1. Install the package
+Install the package:
 
 ```bash
 pnpm i @beparallel/langchain-ts
 ```
 
-2. Set the environment variables in your `.env` file
+## Configuration
+
+Add the following environment variables (e.g. in a `.env` file):
+
+| Variable           | Required | Description                                   |
+| ------------------ | -------- | --------------------------------------------- |
+| `LANGCHAIN_API_KEY`| Yes      | Your LangSmith API key                        |
+| `LANGCHAIN_TAG`    | Yes      | The Hub tag to pull (e.g. `latest`, `staging`) |
 
 ```bash
 LANGCHAIN_API_KEY=your_api_key
 LANGCHAIN_TAG=your_tag
 ```
 
-3. Set up the script in your `package.json` file
+## Usage
 
-```bash
-"scripts": {
-  ...
-  "prompt:generate": "dotenv -f .env.* run -- npx langchain-types --file=X",
-  "prompt:export": "dotenv -f .env.* run -- npx langchain-types --export-dir=./prompts/",
-  "prompt:all": "dotenv -f .env.* run -- npx langchain-types --file=X --export-dir=./prompts/"
-}
-```
+At least one of `--file` or `--export-dir` is required.
 
-Where:
+### CLI flags
 
--   `--file=X` is the path to the file where you want to save the generated types.
--   `--export-dir=D` is the directory to write prompt JSON files for offline use.
--   At least one of `--file` or `--export-dir` is required.
--   Optional: `--name=Y` to filter prompts by name (partial match).
--   Optional: `--tag=Z` to override the `LANGCHAIN_TAG` environment variable.
+| Flag              | Description                                          |
+| ----------------- | ---------------------------------------------------- |
+| `--file=PATH`     | Output path for the generated TypeScript types file   |
+| `--export-dir=DIR`| Directory to write per-prompt JSON files              |
+| `--name=NAME`     | Filter prompts by name (partial match)                |
+| `--tag=TAG`       | Override the `LANGCHAIN_TAG` environment variable      |
 
 ### Examples
 
@@ -56,64 +55,120 @@ npx langchain-types --export-dir=./prompts/
 
 # Both at once
 npx langchain-types --file=./prompt.types.ts --export-dir=./prompts/
+
+# Filter to a single prompt
+npx langchain-types --file=./prompt.types.ts --name=my-prompt
 ```
 
-The `--export-dir` flag serializes each prompt via LangChain's `toJSON()` and writes it to `<dir>/<prompt-name>.json`. These files can be loaded offline with LangChain's `load()` without calling `pull()` at runtime.
+### package.json scripts
 
-4. Run the script
+A typical setup using [dotenv-cli](https://www.npmjs.com/package/dotenv-cli) to load env vars:
 
-```bash
-pnpm prompt:generate
+```json
+{
+  "scripts": {
+    "prompt:generate": "dotenv -f .env run -- npx langchain-types --file=./types/prompts.ts",
+    "prompt:export": "dotenv -f .env run -- npx langchain-types --export-dir=./prompts/",
+    "prompt:all": "dotenv -f .env run -- npx langchain-types --file=./types/prompts.ts --export-dir=./prompts/"
+  }
+}
 ```
 
-# Contributing
+### How prompt export works
 
-## Installation
+The `--export-dir` flag calls LangChain's `toJSON()` on each `ChatPromptTemplate` and writes the result to `<dir>/<prompt-name>.json`. These files contain the full serialized representation (message templates, input variables, output schema) and can be loaded with LangChain's `load()` deserialization -- no network call to the Hub required.
+
+## Programmatic API
+
+The package also exports functions for use in your own scripts:
+
+```typescript
+import { extractPrompts, generateTypes, exportPrompts } from '@beparallel/langchain-ts'
+
+const prompts = await extractPrompts({
+  langchainApiKey: process.env.LANGCHAIN_API_KEY!,
+  langchainTag: 'latest',
+})
+
+generateTypes(prompts, './prompt.types.ts')
+exportPrompts(prompts, './prompts/')
+```
+
+## Contributing
+
+### Setup
 
 ```bash
 pnpm i
 ```
 
-## Usage
-
-1. Add the environment variables in your `.env` file
-
-```bash
-LANGCHAIN_API_KEY=your_api_key
-LANGCHAIN_TAG=your_tag
-```
-
-2. Export them
+### Environment
 
 ```bash
 export LANGCHAIN_API_KEY=your_api_key
 export LANGCHAIN_TAG=your_tag
 ```
 
-3. Run the script
+### Running locally
 
 ```bash
 pnpm prompt:generate
 ```
 
+### Tests
+
+```bash
+pnpm test
+```
+
 ### Release
 
-1. Update the version in the `package.json` file.
-2. Run the following command to update the types.
+1. Update the `version` field in `package.json`.
+2. Build the project:
+   ```bash
+   pnpm prepublish
+   ```
+3. Publish:
+   ```bash
+   npm publish --access public
+   ```
+4. Commit, push, and create a GitHub release.
 
-```bash
-pnpm prepublish
-```
+## Changelog
 
-3. Run npm publish command
+### 1.1.0
 
-```bash
-npm publish --access public
-```
+- Add `--export-dir` CLI flag to serialize prompts as JSON files for offline use
+- Make `--file` optional (at least one of `--file` or `--export-dir` is now required)
+- Add `exportPrompts()` to the programmatic API
+- Clean up dead code in CLI entry point
 
-4. Commit and push the changes.
-5. Create a new release on GitHub.
+### 1.0.0
 
-# License
+- Upgrade to LangChain v1 (`@langchain/core` ^1.x, `langchain` ^1.x)
+
+### 0.3.0
+
+- Upgrade dependencies to latest versions
+- Refactor parser module to use named import for `pull` from `langchain/hub`
+
+### 0.2.8
+
+- Add `--name` flag for filtering prompts by name (partial match)
+- Add `--tag` flag for overriding `LANGCHAIN_TAG` from the command line
+
+### 0.2.0
+
+- Add ESLint, Jest, and Prettier configuration
+- Introduce utility functions for case conversion
+- Add unit tests for parser and type generator modules
+
+### 0.1.0
+
+- Initial release
+- CLI for extracting LangSmith Hub prompts and generating TypeScript types
+- Enum, interface, and Zod schema generation from prompt JSON schemas
+
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
