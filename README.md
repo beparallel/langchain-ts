@@ -132,19 +132,18 @@ pnpm test
 
 ### Release
 
-Publishing is automated via GitHub Actions. When a `v*` tag is pushed, the workflow runs tests, builds, publishes to npm, and creates a GitHub release with auto-generated notes.
-
 ```bash
-# Bump version (patch, minor, or major) -- this updates package.json and creates a git tag
+# 1. Bump version (patch, minor, or major)
 npm version patch   # 1.1.0 -> 1.1.1
 npm version minor   # 1.1.0 -> 1.2.0
 npm version major   # 1.1.0 -> 2.0.0
 
-# Push the commit and tag to trigger the publish workflow
+# 2. Publish to npm
+npm publish --access public
+
+# 3. Push the commit and tag
 git push --follow-tags
 ```
-
-Prerequisites: the repo needs `NPM_TOKEN` configured in GitHub Secrets (Settings > Secrets and variables > Actions).
 
 ## Changelog
 
