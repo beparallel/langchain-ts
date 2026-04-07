@@ -76,7 +76,16 @@ A typical setup using [dotenv-cli](https://www.npmjs.com/package/dotenv-cli) to 
 
 ### How prompt export works
 
-The `--export-dir` flag calls LangChain's `toJSON()` on each `ChatPromptTemplate` and writes the result to `<dir>/<prompt-name>.json`. These files contain the full serialized representation (message templates, input variables, output schema) and can be loaded with LangChain's `load()` deserialization -- no network call to the Hub required.
+The `--export-dir` flag calls LangChain's `toJSON()` on each `ChatPromptTemplate` and writes the result to `<dir>/<tag>/<prompt-name>.json`, organized by tag. For example, with `--export-dir=./prompts/ --tag=staging`:
+
+```
+prompts/
+  staging/
+    my-prompt.json
+    another-prompt.json
+```
+
+These files contain the full serialized representation (message templates, input variables, output schema) and can be loaded with LangChain's `load()` deserialization -- no network call to the Hub required.
 
 ## Programmatic API
 
@@ -91,7 +100,7 @@ const prompts = await extractPrompts({
 })
 
 generateTypes(prompts, './prompt.types.ts')
-exportPrompts(prompts, './prompts/')
+exportPrompts(prompts, './prompts/', 'latest')
 ```
 
 ## Contributing
@@ -123,16 +132,19 @@ pnpm test
 
 ### Release
 
-1. Update the `version` field in `package.json`.
-2. Build the project:
-   ```bash
-   pnpm prepublish
-   ```
-3. Publish:
-   ```bash
-   npm publish --access public
-   ```
-4. Commit, push, and create a GitHub release.
+Publishing is automated via GitHub Actions. When a `v*` tag is pushed, the workflow runs tests, builds, publishes to npm, and creates a GitHub release with auto-generated notes.
+
+```bash
+# Bump version (patch, minor, or major) -- this updates package.json and creates a git tag
+npm version patch   # 1.1.0 -> 1.1.1
+npm version minor   # 1.1.0 -> 1.2.0
+npm version major   # 1.1.0 -> 2.0.0
+
+# Push the commit and tag to trigger the publish workflow
+git push --follow-tags
+```
+
+Prerequisites: the repo needs `NPM_TOKEN` configured in GitHub Secrets (Settings > Secrets and variables > Actions).
 
 ## Changelog
 

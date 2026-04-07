@@ -2,9 +2,11 @@ import { ChatPromptTemplate } from '@langchain/core/prompts'
 import fs from 'fs'
 import path from 'path'
 
-export function exportPrompts(prompts: ChatPromptTemplate[], outputDir: string) {
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true })
+export function exportPrompts(prompts: ChatPromptTemplate[], outputDir: string, tag: string) {
+    const tagDir = path.join(outputDir, tag)
+
+    if (!fs.existsSync(tagDir)) {
+        fs.mkdirSync(tagDir, { recursive: true })
     }
 
     let exported = 0
@@ -17,10 +19,10 @@ export function exportPrompts(prompts: ChatPromptTemplate[], outputDir: string) 
         }
 
         const data = prompt.toJSON()
-        const filePath = path.join(outputDir, `${promptName}.json`)
+        const filePath = path.join(tagDir, `${promptName}.json`)
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8')
         exported++
     }
 
-    console.log(`✅ Exported ${exported} prompt(s) to ${outputDir}`)
+    console.log(`✅ Exported ${exported} prompt(s) to ${tagDir}`)
 }
