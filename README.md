@@ -1,11 +1,12 @@
 # @beparallel/langchain-ts
 
-A TypeScript tool for extracting Langchain prompts and generating corresponding TypeScript types.
+A TypeScript tool for extracting Langchain prompts and generating corresponding TypeScript types, with optional offline prompt export.
 
 # Features
 
 -   Extracts prompts from Langchain Hub
 -   Generates TypeScript interfaces for prompt inputs and outputs
+-   Exports full prompt content as JSON files for offline use
 -   Automatically handles JSON schema conversion
 -   Command-line interface for easy integration
 -   Optional filtering by prompt name and tag override
@@ -30,15 +31,34 @@ LANGCHAIN_TAG=your_tag
 ```bash
 "scripts": {
   ...
-  "prompt:generate": "dotenv -f .env.* run -- npx langchain-types --file=X"
+  "prompt:generate": "dotenv -f .env.* run -- npx langchain-types --file=X",
+  "prompt:export": "dotenv -f .env.* run -- npx langchain-types --export-dir=./prompts/",
+  "prompt:all": "dotenv -f .env.* run -- npx langchain-types --file=X --export-dir=./prompts/"
 }
 ```
 
 Where:
 
--   `X` is the path to the file where you want to save the types.
+-   `--file=X` is the path to the file where you want to save the generated types.
+-   `--export-dir=D` is the directory to write prompt JSON files for offline use.
+-   At least one of `--file` or `--export-dir` is required.
 -   Optional: `--name=Y` to filter prompts by name (partial match).
 -   Optional: `--tag=Z` to override the `LANGCHAIN_TAG` environment variable.
+
+### Examples
+
+```bash
+# Generate types only
+npx langchain-types --file=./prompt.types.ts
+
+# Export prompts as JSON only
+npx langchain-types --export-dir=./prompts/
+
+# Both at once
+npx langchain-types --file=./prompt.types.ts --export-dir=./prompts/
+```
+
+The `--export-dir` flag serializes each prompt via LangChain's `toJSON()` and writes it to `<dir>/<prompt-name>.json`. These files can be loaded offline with LangChain's `load()` without calling `pull()` at runtime.
 
 4. Run the script
 
