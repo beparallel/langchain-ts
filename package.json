@@ -12,7 +12,7 @@
         "test": "jest",
         "prompt:generate": "node ./dist/cli.js --file=./types/prompts.ts && npx prettier --write ./types/prompts.ts",
         "prettier": "npx prettier --write types/*.ts",
-        "prepublish": "pnpm run build"
+        "prepublishOnly": "pnpm run build"
     },
     "keywords": [
         "langchain",

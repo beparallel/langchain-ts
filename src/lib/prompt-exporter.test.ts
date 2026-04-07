@@ -12,31 +12,34 @@ describe('Prompt Exporter', () => {
         mockedFs.existsSync.mockReturnValue(false)
     })
 
-    test('creates output directory if it does not exist', () => {
-        exportPrompts([], '/test/prompts')
+    test('creates tag subdirectory if it does not exist', () => {
+        exportPrompts([], '/test/prompts', 'latest')
 
-        expect(mockedFs.mkdirSync).toHaveBeenCalledWith('/test/prompts', { recursive: true })
+        expect(mockedFs.mkdirSync).toHaveBeenCalledWith(
+            path.join('/test/prompts', 'latest'),
+            { recursive: true },
+        )
     })
 
-    test('skips mkdir if directory already exists', () => {
+    test('skips mkdir if tag directory already exists', () => {
         mockedFs.existsSync.mockReturnValue(true)
 
-        exportPrompts([], '/test/prompts')
+        exportPrompts([], '/test/prompts', 'latest')
 
         expect(mockedFs.mkdirSync).not.toHaveBeenCalled()
     })
 
-    test('writes each prompt as a JSON file named by lc_hub_repo', () => {
+    test('writes each prompt as a JSON file under the tag directory', () => {
         const jsonData = { id: ['langchain', 'prompts', 'ChatPromptTemplate'], kwargs: { messages: [] } }
         const mockPrompt = {
             metadata: { lc_hub_repo: 'my-prompt' },
             toJSON: () => jsonData,
         } as unknown as ChatPromptTemplate
 
-        exportPrompts([mockPrompt], '/out')
+        exportPrompts([mockPrompt], '/out', 'staging')
 
         expect(mockedFs.writeFileSync).toHaveBeenCalledWith(
-            path.join('/out', 'my-prompt.json'),
+            path.join('/out', 'staging', 'my-prompt.json'),
             JSON.stringify(jsonData, null, 2),
             'utf-8',
         )
@@ -50,7 +53,7 @@ describe('Prompt Exporter', () => {
             toJSON: () => ({}),
         } as unknown as ChatPromptTemplate
 
-        exportPrompts([mockPrompt], '/out')
+        exportPrompts([mockPrompt], '/out', 'latest')
 
         expect(mockedFs.writeFileSync).not.toHaveBeenCalled()
         expect(warnSpy).toHaveBeenCalledWith('Skipping prompt with no lc_hub_repo metadata')
@@ -61,10 +64,10 @@ describe('Prompt Exporter', () => {
     test('handles empty prompts array', () => {
         const logSpy = jest.spyOn(console, 'log').mockImplementation()
 
-        exportPrompts([], '/out')
+        exportPrompts([], '/out', 'latest')
 
         expect(mockedFs.writeFileSync).not.toHaveBeenCalled()
-        expect(logSpy).toHaveBeenCalledWith('✅ Exported 0 prompt(s) to /out')
+        expect(logSpy).toHaveBeenCalledWith(`✅ Exported 0 prompt(s) to ${path.join('/out', 'latest')}`)
 
         logSpy.mockRestore()
     })
@@ -80,16 +83,16 @@ describe('Prompt Exporter', () => {
             toJSON: () => ({ id: 'second' }),
         } as unknown as ChatPromptTemplate
 
-        exportPrompts([mockPrompt1, mockPrompt2], '/out')
+        exportPrompts([mockPrompt1, mockPrompt2], '/out', 'latest')
 
         expect(mockedFs.writeFileSync).toHaveBeenCalledTimes(2)
         expect(mockedFs.writeFileSync).toHaveBeenCalledWith(
-            path.join('/out', 'first-prompt.json'),
+            path.join('/out', 'latest', 'first-prompt.json'),
             JSON.stringify({ id: 'first' }, null, 2),
             'utf-8',
         )
         expect(mockedFs.writeFileSync).toHaveBeenCalledWith(
-            path.join('/out', 'second-prompt.json'),
+            path.join('/out', 'latest', 'second-prompt.json'),
             JSON.stringify({ id: 'second' }, null, 2),
             'utf-8',
         )
@@ -101,10 +104,10 @@ describe('Prompt Exporter', () => {
             toJSON: () => ({ id: 'test' }),
         } as unknown as ChatPromptTemplate
 
-        exportPrompts([mockPrompt], '/out')
+        exportPrompts([mockPrompt], '/out', 'latest')
 
         expect(mockedFs.writeFileSync).toHaveBeenCalledWith(
-            path.join('/out', 'org-my-prompt.json'),
+            path.join('/out', 'latest', 'org-my-prompt.json'),
             JSON.stringify({ id: 'test' }, null, 2),
             'utf-8',
         )

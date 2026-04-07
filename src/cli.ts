@@ -44,7 +44,7 @@ async function main() {
 
     if (exportDirArg) {
         const exportDir = exportDirArg.split('=')[1]
-        exportPrompts(prompts, exportDir)
+        exportPrompts(prompts, exportDir, langchainTag)
     }
 }
 
